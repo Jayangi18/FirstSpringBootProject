@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1")
+@RequestMapping("/api/v1")
 public class UserController {
 
     @Autowired
@@ -21,10 +21,10 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @PostMapping("/save")
-    public ResponseEntity<User> saveUser(@RequestBody User user){
-        return ResponseEntity.ok(userService.saveUser(user));
-    }
+//    @PostMapping("/save")
+//    public ResponseEntity<User> saveUser(@RequestBody User user){
+//        return ResponseEntity.ok(userService.saveUser(user));
+//    }
 
     //Get id
     @GetMapping("/get-by-id/{id}")
@@ -39,8 +39,12 @@ public class UserController {
     }
 
     @DeleteMapping("delete/{id}")
-    public void deleteUser(@PathVariable Long id){
+//    public void deleteUser(@PathVariable Long id){
+//        userService.deleteUser(id);
+//    }
+    public ResponseEntity<?> deleteUser(@PathVariable Long id){
         userService.deleteUser(id);
+        return ResponseEntity.ok().build();
     }
 
 }

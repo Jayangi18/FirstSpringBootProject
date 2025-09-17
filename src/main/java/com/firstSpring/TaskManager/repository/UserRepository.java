@@ -3,6 +3,10 @@ package com.firstSpring.TaskManager.repository;
 import com.firstSpring.TaskManager.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends JpaRepository<User, Long > {
+import java.util.Optional;
 
+public interface UserRepository extends JpaRepository<User, Long > {
+    //to help authenticate users
+    Optional<User> findByUsername(String username);
+    boolean existsByUsername(String username);
 }
