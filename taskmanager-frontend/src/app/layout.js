@@ -1,10 +1,10 @@
 import '../app/globals.css';
 import Header from './components/Header';
 
-export const metadata = {
-  title: "TaskManager Web",
-  description: "Manage tasks efficiently",
-};
+//export const metadata = {
+//  title: "TaskManager Web",
+//  description: "Manage tasks efficiently",
+//};
 
 export default function RootLayout({ children }) {
   return (
