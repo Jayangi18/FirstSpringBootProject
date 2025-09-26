@@ -3,7 +3,6 @@ package com.firstSpring.TaskManager.service;
 import com.firstSpring.TaskManager.dto.AuthRequest;
 import com.firstSpring.TaskManager.model.User;
 import com.firstSpring.TaskManager.repository.UserRepository;
-import com.firstSpring.TaskManager.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,13 +19,10 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
     private AuthenticationManager authenticationManager;
 
     //signup-save user with hashed password and return jwt
-    public String signup(AuthRequest request){
+    public User signup(AuthRequest request){
         if (userRepository.existsByUsername(request.getUsername())){
             throw new RuntimeException("Username already exists.");
         }
@@ -39,7 +35,6 @@ public class AuthService {
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-//        user.setRole("USER");
 
         String role = (request.getRole() == null || request.getRole().isBlank())
                 ?"USER"
@@ -49,29 +44,19 @@ public class AuthService {
         }
         user.setRole(role);
 
-        userRepository.save(user);
-
-        return jwtUtil.generateToken(user.getUsername());
+        return userRepository.save(user);
     }
 
     //login- authenticate and return jwt
-    public String login(AuthRequest request){
+    public User login(AuthRequest request){
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
                         request.getPassword()
                 )
         );
-        return jwtUtil.generateToken(request.getUsername());
+
+        return userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
-//    public String login(AuthRequest request) {
-//        User user = userRepository.findByUsername(request.getUsername())
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-//
-//        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-//            throw new RuntimeException("Invalid password");
-//        }
-//
-//        return jwtUtil.generateToken(user.getUsername());
-//    }
 }

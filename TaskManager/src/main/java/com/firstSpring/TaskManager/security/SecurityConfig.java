@@ -38,12 +38,18 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:3001"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        return new UrlBasedCorsConfigurationSource() {{
-            registerCorsConfiguration("/**", configuration);
-        }};
+        configuration.setAllowCredentials(true);
+
+//        return new UrlBasedCorsConfigurationSource() {{
+//            registerCorsConfiguration("/**", configuration);
+//        }};
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+
     }
 
     @Bean
@@ -53,7 +59,9 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()    //Allow auth endpoints signup, login
-                        .requestMatchers("/api/v1/all").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/all").hasRole("ADMIN") //view all users
+                        .requestMatchers("/api/v1/update/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/api/v1/delete/**").hasAnyRole("ADMIN", "USER")
                         .anyRequest().authenticated()  //Protect all other endpoints
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

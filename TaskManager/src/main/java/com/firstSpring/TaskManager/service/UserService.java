@@ -26,28 +26,47 @@ public class UserService {
 
     //Get all users
     public List<User> getAllUsers(){
+
         return userRepository.findAll();
     }
 
-    public User getIUserById(Long userId){
+    //Get user by id
+    public User getUserById(Long userId){
         return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    public User updateUser(User userToUpdate, Long userId){
+    //Get user by username
+    public User getUserByUsername(String username){
+        return userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    //Update user
+    public User updateUser(User userToUpdate, Long userId, String requestUsername, String requestRole){
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+        //role check - if not admin
+        if (!"ADMIN".equalsIgnoreCase(requestRole) &&
+                !user.getUsername().equals(requestUsername)) {
+            throw new RuntimeException("Access denied: You can only update your own profile");
+        }
+
+        //if admin
         user.setUsername(userToUpdate.getUsername());
         user.setEmail(userToUpdate.getEmail());
 
+        // If USER is updating themselves, allow email/username changes too
         return userRepository.save(user);
     }
 
-    public void deleteUser(Long userId){
-        if (userRepository.existsById(userId)){
-            userRepository.deleteById(userId);
-        }
-        else {
-            throw new RuntimeException("User not found");
-        }
-    }
+    //delete user
+    public void deleteUser(Long userId, String requestUsername, String requestRole){
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
+        if (!"ADMIN".equalsIgnoreCase(requestRole) &&
+                !user.getUsername().equals(requestUsername)) {
+            throw new RuntimeException("Access denied: You can only delete your own account");
+        }
+
+        userRepository.delete(user);
+    }
 }

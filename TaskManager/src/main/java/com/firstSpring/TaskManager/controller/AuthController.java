@@ -4,6 +4,8 @@ package com.firstSpring.TaskManager.controller;
 import com.firstSpring.TaskManager.dto.AuthRequest;
 import com.firstSpring.TaskManager.dto.AuthResponse;
 import com.firstSpring.TaskManager.service.AuthService;
+import com.firstSpring.TaskManager.model.User;
+import com.firstSpring.TaskManager.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,22 +21,28 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    //public endpoints for auth.  return JWTs, can use for protected endpoints.
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    //signup endpoint
     @PostMapping("/signup")
     public ResponseEntity<AuthResponse> signup(@RequestBody AuthRequest request){
         try {
-            String token = authService.signup(request);
-            return ResponseEntity.ok(new AuthResponse(token));
+            User user = authService.signup(request);
+            String token = jwtUtil.generateToken(user.getUsername());
+            return ResponseEntity.ok(new AuthResponse(token, user.getRole()));
         }catch (RuntimeException e){
             return ResponseEntity.badRequest().body(new AuthResponse("Error:" + e.getMessage()));
         }
     }
 
+    //login endpoint
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request){
         try {
-            String token = authService.login(request);
-            return ResponseEntity.ok(new AuthResponse(token));
+            User user = authService.login(request);
+            String token = jwtUtil.generateToken(user.getUsername());
+            return ResponseEntity.ok(new AuthResponse(token, user.getRole()));
         }catch (RuntimeException e){
             return ResponseEntity.badRequest().body(new AuthResponse("Error: Invalid Credentials"));
         }

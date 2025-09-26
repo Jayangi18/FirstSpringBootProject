@@ -3,12 +3,20 @@ package com.firstSpring.TaskManager.dto;
 //@Data
 public class AuthResponse {
     private String token;
+    private String role;
 
     public AuthResponse() {
     }
 
+    public AuthResponse(String token, String role) {
+        this.token = token;
+        this.role = role;
+    }
+
+    //for error messages
     public AuthResponse(String token) {
         this.token = token;
+        this.role = null;
     }
 
     public String getToken() {
@@ -19,8 +27,11 @@ public class AuthResponse {
         this.token = token;
     }
 
-//    @Override
-//    public String toString() {
-//        return "AuthResponse{token='" + (token != null ? "***" : "null") + "'}"; // Don't log actual token
-//    }
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 }
