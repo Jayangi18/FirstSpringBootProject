@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { login } from '../../lib/api';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ username: '', password: '' });
@@ -24,7 +25,6 @@ export default function LoginPage() {
       } else {
         router.push('/user/dashboard');
       }
-
     } catch (error) {
       console.error('Login failed:', error);
       alert('Login failed!');
@@ -69,6 +69,14 @@ export default function LoginPage() {
             Login
           </button>
         </form>
+
+        {/* Signup link */}
+        <p className="text-center text-gray-600 text-sm mt-6">
+          Don’t have an account?{' '}
+          <Link href="/signup" className="text-blue-600 hover:underline font-medium">
+            Sign Up
+          </Link>
+        </p>
       </div>
     </div>
   );
